@@ -26,13 +26,16 @@ jobs:
        - name: Build and tag Docker Image
          run: |
            TAG_NAME=${GITHUB_REF##*/}
+           if [[ ! "$TAG_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Not a semver tag (vX.Y.Z). Skipping docker tag."
+            exit 0
+           fi           
            SHORT_SHA=$(git rev-parse --short HEAD)
            BUILD_DATE=$(date +%Y%m%d%H%M%S)
            IMAGE_TAG=${TAG_NAME}-${BUILD_DATE}-${SHORT_SHA}
 
-           echo "Building image: nginx:$IMAGE_TAG"
-           docker pull nginx:latest
-           docker tag nginx:latest nginx:$IMAGE_NAME
-           echo "Tagged nginx image as: nginx:$IMAGE_TAG"
+           echo "Building Go App Docker image: my-go-app:$IMAGE_TAG"
+           docker build -t my-go-app:$IMAGE_TAG 
+           echo "Docker image built and tagged as: my-go-app:$IMAGE_TAG"
         
      
